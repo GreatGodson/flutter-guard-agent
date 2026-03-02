@@ -1,0 +1,23 @@
+---
+description: Naming and DTO / model conventions
+globs: lib/**/models/** lib/**.dart
+alwaysApply: false
+---
+
+## Naming & Clean Code Conventions
+
+- Prefer **type-safe DTOs and models** for backend communication.
+- Name DTOs and models clearly:
+  - Suffixes like `Dto`, `Model`, or domain-specific terms are acceptable as
+    long as they are consistent.
+- Keep models:
+  - Focused on data representation.
+  - Free from UI-specific concerns.
+
+When creating or refactoring models:
+
+- Favour immutable data where reasonable (e.g. `const` constructors, `final`
+  fields.
+- Avoid mixing network parsing logic directly into UI widgets – prefer moving
+  JSON decode / encode to dedicated model or data-layer code.
+

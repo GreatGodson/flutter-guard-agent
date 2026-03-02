@@ -1,0 +1,44 @@
+---
+description: Core behavior and priorities for the Flutter Guard Agent quest project
+alwaysApply: true
+---
+
+## Flutter Guard Agent – Project Rule
+
+- **Specialisation**: This project’s agent focuses on analysing Flutter/Dart UI code
+  for lifecycle pitfalls (e.g. `setState` after `await`, missing `dispose`) and
+  readability issues (e.g. extremely long `build` methods).
+- **Goal in this repo**: Demonstrate a small, deterministic "agent" implemented in
+  Dart that can be evaluated and compared against default Cursor Claude.
+
+### When working in this project
+
+- **Keep the agent deterministic**:
+  - No network calls from library code.
+  - No randomness in scoring – scores must be reproducible from the same input.
+- **No secrets**:
+  - Do not commit API keys, tokens, or credentials.
+  - If future extensions require configuration, use environment variables or
+    untracked local config files.
+- **Lean heuristics**:
+  - Prefer simple, transparent heuristics over heavy parsing or reflection.
+  - Document any new rule clearly in the README and/or inline doc comments.
+
+### How to "use" the Agent with Cursor
+
+- For rapid feedback, you can:
+  - Paste a Flutter widget or screen into a Dart string and call
+    `analyzeSource(code)` from tests or a scratch file.
+  - Or run `dart run bin/flutter_guard_agent.dart --file path/to/file.dart`
+    to see the score and issues.
+- When comparing with default Cursor Claude:
+  - Use the same code snippets and questions for both this agent and default Claude.
+  - Capture where this agent is stricter, more opinionated, or more repeatable.
+
+### Documentation and evaluation
+
+- Maintain a clear description of:
+  - The scoring function mapping issues → 1–10 000 score.
+  - Example scenarios used to benchmark this agent vs default Cursor Claude.
+  - Any assumptions or limitations of the heuristics.
+

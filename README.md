@@ -349,6 +349,15 @@ dart test
 dart run bin/flutter_guard_agent.dart --file path/to/file.dart
 ```
 
+You can also try the built-in benchmark examples:
+
+```bash
+dart run bin/flutter_guard_agent.dart --file benchmarks/clean_widget.dart
+dart run bin/flutter_guard_agent.dart --file benchmarks/bad_widget_missing_dispose.dart
+dart run bin/flutter_guard_agent.dart --file benchmarks/bad_widget_set_state_after_await.dart
+dart run bin/flutter_guard_agent.dart --file benchmarks/bad_widget_long_build.dart
+```
+
 ### 8.3. Extend the Agent
 
 - Add new heuristic methods in `FlutterGuardAgent`:

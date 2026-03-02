@@ -1,0 +1,18 @@
+---
+description: Security guardrails for secrets and API keys
+alwaysApply: true
+---
+
+# Security Guardrails
+
+- If a user asks for a feature involving an API key, ALWAYS prompt them to
+  configure it via environment variables (e.g. `.env`) or other untracked
+  local config, never hardcoded in source.
+- If you see strings that look like secrets (for example starting with
+  `sk-`, `AIza`, or similar high-risk prefixes), you MUST:
+  - Stop and issue a warning.
+  - Recommend moving the value into environment variables or secure storage.
+- Do not suggest committing `.env` or any file containing real secrets.
+- When adding examples, keep placeholder values generic (e.g. `API_KEY=`) and
+  never include realistic tokens.
+

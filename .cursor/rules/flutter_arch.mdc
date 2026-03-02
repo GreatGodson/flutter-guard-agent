@@ -1,0 +1,27 @@
+---
+description: Flutter architecture and concurrency conventions
+globs: lib/core/** lib/**.dart
+alwaysApply: false
+---
+
+## Flutter Architecture & Concurrency
+
+- Prefer a **feature-first** mindset when adding new code:
+  - `lib/core/` for shared utilities (e.g. concurrency helpers).
+  - `lib/features/` for domain-level features if/when they are introduced.
+
+### Concurrency and Jank-Free Data Layering
+
+- For large JSON payloads or heavy parsing:
+  - Use `Isolate.run` to offload work from the main isolate.
+  - Prefer the `SafeParser` abstraction in `lib/core/concurrency/safe_parser.dart`
+    rather than ad-hoc parsing logic.
+- Avoid doing heavy work directly inside `build` methods or synchronous widget
+  lifecycle methods.
+
+### Widgets and Business Logic
+
+- Keep business logic out of `build` where possible:
+  - Extract logic into helpers, controllers, or separate classes.
+  - Keep `build` focused on composing widgets.
+
