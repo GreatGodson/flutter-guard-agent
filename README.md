@@ -189,6 +189,16 @@ This repo is configured to be **Cursor-ready**:
     - How to invoke the CLI and library from Cursor.
   - Marked with `alwaysApply: true` for this project so Cursor always has
     the right context when working here.
+- `.cursor/rules/flutter_arch.mdc`, `naming_convos.mdc`, `security.mdc`:
+  - Capture project-level architecture, naming, and security guardrails that
+    Cursor follows when generating or editing code in this repo.
+- `.cursor/rules/flutter_clean_arch.mdc`:
+  - Encodes a Clean Architecture + BLoC + repository/service + analytics
+    setup for a larger Flutter app (layers, feature structure, DI, Dio, and
+    Firebase analytics requirements).
+  - You can copy this rule file into another Flutter app’s `.cursor/rules/`
+    and reference it from that app’s `.cursorrules` to make Cursor follow the
+    same conventions there.
 
 You can open this repo in Cursor and immediately:
 

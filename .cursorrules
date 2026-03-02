@@ -16,6 +16,10 @@ You are a specialized Flutter Guard Agent designed to:
   `.cursor/rules/security.mdc`.
 - For overall project behaviour and specialisation, also consider
   `.cursor/rules/flutter-guard-agent.mdc`.
+- When working in a Flutter app that follows Clean Architecture under
+  `app/lib/src/`, you can also use `.cursor/rules/flutter_clean_arch.mdc`
+  as a template or directly (by copying it into that app) to guide BLoC,
+  repository, service, and analytics patterns.
 
 ## Contextual Knowledge
 

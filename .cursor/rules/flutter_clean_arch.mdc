@@ -1,0 +1,201 @@
+---
+description: Clean Architecture, BLoC, repository, and analytics conventions for a Flutter app
+globs: app/lib/src/**
+alwaysApply: false
+---
+
+## Clean Architecture & BLoC – App Rules
+
+This rule describes how a Flutter application should be structured and how
+Cursor should generate code when building or modifying features using
+Clean Architecture and the BLoC pattern.
+
+The app is assumed to have:
+- `app/`: Main application package.
+- `app_ui/`: Shared UI component library.
+
+### Architecture & Structure
+
+Under `app/lib/src/` the project uses these layers:
+
+1. **Core (`core/`)**
+   - `configs/`: App configuration, routes, dependency injection.
+   - `const/`: Constants, assets paths, formatters.
+   - `enum/`: Shared enums (e.g., `UiState`).
+   - `exceptions/`: Error handling and logging.
+   - `extensions/`: Extension methods.
+   - `network_setup/`: Dio configuration and interceptors.
+   - `utils/`: Utility functions.
+
+2. **Domain (`domain/`)**
+   - Organized by feature modules (e.g., `mcs/`, `mdt/`, `mmy/`, `msc/`, `mmn/`).
+   - Contains data models and domain entities.
+   - Entities should typically extend `Equatable`.
+   - Avoid direct dependencies on Flutter or heavy external packages.
+
+3. **Presentation (`presentation/`)**
+   - Organized by feature modules with:
+     - `bloc/`: BLoC, events, and states (using `part` files).
+     - `view/`: Page widgets.
+     - `widget/` or `widgets/`: Feature-specific widgets.
+     - `data/`: Presentation data models (if needed).
+   - Common pieces live in `presentation/common/`.
+
+4. **Repositories (`repositories/`)**
+   - Define abstraction for data access as abstract classes.
+   - Implementation classes (prefixed with `I`) handle data operations.
+   - Organized by feature.
+
+5. **Services (`services/`)**
+   - External services (e.g., APIs, Firebase) via abstract contracts.
+   - Implementations prefixed with `I`, organized by feature.
+
+### Naming & Structure Conventions
+
+- **Classes**: PascalCase (e.g., `MyInformationBloc`, `BrowserErrorPage`).
+- **Files**: snake_case (e.g., `my_information_bloc.dart`).
+- **Variables/Methods**: camelCase.
+- **Enums**: PascalCase.
+- **Route names**: camelCase (e.g., `browserError`).
+- **Route params classes**: Suffix with `Params` (e.g., `BrowserErrorPageParams`).
+- **Feature directories** follow:
+
+```text
+presentation/
+  feature_name/
+    bloc/
+      feature_name_bloc.dart
+      feature_name_event.dart
+      feature_name_state.dart
+    view/
+      feature_name_page.dart
+    widget/
+      feature_specific_widget.dart
+```
+
+### BLoC Pattern Rules
+
+- Use `part` directives for events and states:
+
+```dart
+part 'my_information_event.dart';
+part 'my_information_state.dart';
+```
+
+- Event handlers are private methods with `_on` prefix (e.g., `_onLoadMyInformation`).
+- Use a shared `UiState` enum (`initial`, `loading`, `loaded`, `error`).
+- BLoC state classes:
+  - Extend `Equatable`.
+  - Use `copyWith` for immutable updates.
+
+### Widgets & Pages
+
+- **Pages**: Full-screen widgets in `view/` (e.g., `FeaturePage`).
+- **Widgets**: Reusable components in `widget/` or `widgets/`.
+- Prefer `StatelessWidget` when possible; use `StatefulWidget` only when necessary.
+- Extract complex UI into private helper methods (e.g., `_buildErrorContent`).
+
+### Routing
+
+- Use `go_router` with configs in `route_config.dart`.
+- Route names live in `route_name.dart` as static consts.
+- Route params are in `route_params.dart` classes.
+- Prefer `NoTransitionPage` for pages.
+- Always validate route parameters in `redirect` callbacks.
+
+### Localization
+
+- Use `context.l10n` for text.
+- Never hardcode user-facing strings.
+- ARB files live under `app/lib/l10n/arb/`.
+
+### UI Components (app_ui)
+
+- Use components from `app_ui` only:
+  - Import with `import 'package:app_ui/app_theme.dart';`.
+  - Colors: `AppSemanticColors.*`.
+  - Text styles: `AppTextStyle.*` with extensions (e.g., `.fontIconPrimary`).
+  - Padding: `AppPadding.*`.
+  - Buttons: `AppButton` with `ButtonColor` and `ButtonStyleVariant`.
+  - App bars: `CustomAppBar.sub()` / `CustomAppBar.main()`.
+
+### Error Handling
+
+- Use `ExceptionHandler.handleServiceException()` in repositories.
+- Create custom exceptions extending `BaseException`.
+- Use `UiState.error` and dedicated error pages (`presentation/error/view/` or `presentation/common/`).
+
+### Dependency Injection
+
+- Use `get_it` for DI.
+- Register dependencies in `core/configs/locator.dart`.
+
+### Network Layer
+
+- Use Dio for HTTP.
+- Configure under `core/network_setup/dio/`.
+- Keep network calls behind repositories.
+
+### Imports Order
+
+1. Dart SDK imports.
+2. Flutter imports.
+3. Package imports.
+4. Local app imports.
+5. Relative imports (only when necessary).
+
+### Firebase Analytics Enforcement
+
+- For **every** button or tappable widget:
+  - Always add an analytics log event in the `onTap`/`onPressed` callback as
+    the last call.
+  - Use:
+
+```dart
+getIt<AnalyticBloc>().add(
+  AnalyticsLogButtonTap(
+    buttonName: AnalyticsConst.<button_name>,
+  ),
+);
+```
+
+- `AnalyticsConst` naming:
+  - snake_case or lowerCamelCase.
+  - Max 21 characters.
+  - Avoid generic names; make them context-specific (e.g., `login_button`).
+  - Shorten long names but keep them meaningful.
+
+- Cursor should:
+  - Derive the analytics key from button text or purpose.
+  - Automatically add tracking when generating buttons.
+  - If analytics is missing on an existing button, add it.
+  - Import analytics types if missing.
+  - If `AnalyticBloc` or `AnalyticsLogButtonTap` are not defined, remind
+    the developer to define them.
+
+### Testing
+
+- Use `bloc_test` for BLoC tests.
+- Use `mocktail` for mocking.
+- Test files named `feature_name_test.dart`, located next to source or under `test/`.
+
+### Environment & Assets
+
+- Environments (development/staging/production) configured in `app/config/`.
+- Use `EnvironmentConfig` for values.
+- Assets:
+  - Images: `app/assets/images/`.
+  - Animations: `app/assets/animations/`.
+  - Icons: `app_ui/lib/assets/icons/`.
+  - Fonts: `app_ui/lib/assets/fonts/`.
+  - Reference assets via `core/const/assets/` constants.
+
+### General Best Practices
+
+- Follow `very_good_analysis` rules.
+- Use `const` where possible.
+- Prefer composition over inheritance.
+- Keep methods small and single-purpose.
+- Use BLoC for complex state instead of raw `setState`.
+- Follow the feature-first module organization.
+
